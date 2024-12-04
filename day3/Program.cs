@@ -1,22 +1,41 @@
 ﻿using System.Text.RegularExpressions;
 
-var pattern = @"mul\(\d{1,},\d{1,}\)";
+var patternMul = @"mul\(\d{1,},\d{1,}\)";
 int result = 0;
 int product = 1;
+bool flag = true;
 while (Console.ReadLine() is { } line)
 {
-    MatchCollection matches = Regex.Matches(line, pattern);
+    string[] splitLine = Regex.Split(line, @"(do\(\))|(don't\(\))");
     
-    matches.ToList().ForEach(match =>
+    splitLine.ToList().ForEach(l =>
     {
-        MatchCollection matchesNumber = Regex.Matches(match.Value, @"\d{1,}");
-        matchesNumber.ToList().ForEach(m =>
+        if (l == "don't()")
         {
-            //Console.WriteLine(m);
-            product *= int.Parse(m.Value);
-        });
-        result += product;
-        product = 1;
+            flag = false;
+        }
+
+        if (flag || l == "do()")
+        {
+            flag = true;
+            if (l != "do()")
+            {
+                MatchCollection matchesMul = Regex.Matches(l, patternMul);
+                
+                matchesMul.ToList().ForEach(match =>
+                {
+                    Console.WriteLine(match);
+                    MatchCollection matchesNumber = Regex.Matches(match.Value, @"\d{1,}");
+                    matchesNumber.ToList().ForEach(m =>
+                    {
+                        product *= int.Parse(m.Value);
+                    });
+                    result += product;
+                    product = 1;
+                });
+            }
+        }
+        //Console.WriteLine(l);
     });
 }
 
